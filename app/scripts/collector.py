@@ -6,14 +6,41 @@ import requests
 from bs4 import BeautifulSoup
 
 def extract_data():
-    print("Starting data extraction...")
-    raw_jobs = [
-        {"title": "Python Developer", "company": "Tech Corp", "location": "Remote", "salary": "5000"},
-        {"title": "Data Engineer", "company": "Data Inc", "location": "São Paulo", "salary": "7000"},
-        {"title": "Machine Learning Engineer", "company": "AI Solutions", "location": "Remote", "salary": "8500"},
-        {"title": "Backend Developer", "company": "Cloud Systems", "location": "Curitiba", "salary": "not informed"},
-    ]
+    print("Starting real data extraction from Python.org...")
+    url = "https://www.python.org/jobs/"
+    response = requests.get(url)
+    
+    soup = BeautifulSoup(response.text, 'html.parser')
+    
+    raw_jobs = []
+    
+    job_container = soup.find("ol", class_="list-recent-jobs")
+    
+    if job_container:
+        jobs = job_container.find_all("li")
+        
+        for job in jobs:
+            title_tag = job.find("h2").find("a")
+            title = title_tag.text.strip() if title_tag else "No Title"
+            
+            company_tag = job.find("span", class_="listing-company-name")
+            if company_tag:
+                company = company_tag.text.replace("New", "").strip().split('\n')[-1].strip()
+            else:
+                company = "Unknown"
+                
+            location_tag = job.find("span", class_="listing-location")
+            location = location_tag.text.strip() if location_tag else "Remote"
+            
+            raw_jobs.append({
+                "title": title,
+                "company": company,
+                "location": location,
+                "salary": "0" 
+            })
+            
     df = pd.DataFrame(raw_jobs)
+    print(f"Success! {len(df)} jobs extracted from the web.")
     return df
 
 def transform_data(df):
@@ -48,17 +75,6 @@ def load_data(df):
     finally:
         db.close()
 
-def test_scraper():
-    print("Testing connection...")
-    url = "https://news.ycombinator.com/jobs"
-    response = requests.get(url)
-
-    if response.status_code == 200:
-        soup = BeautifulSoup(response.text, 'html.parser')
-        print(f"Success! page: {soup.title.string}")
-    else:
-        print("Error accessing the site.")
-
 if __name__ == "__main__":
     print("Checking database structure...")
     Base.metadata.create_all(bind=engine)
@@ -66,4 +82,3 @@ if __name__ == "__main__":
     raw_df = extract_data()
     clean_df = transform_data(raw_df)
     load_data(clean_df)
-    test_scraper()
