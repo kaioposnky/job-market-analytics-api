@@ -38,11 +38,19 @@ def extract_data():
     return df
 
 def transform_data(df):
-    print("Starting data transformation...")
+    print("Starting data transformation with anti-spam filter...")
     df['salary'] = pd.to_numeric(df['salary'], errors='coerce').fillna(0.0)
     df['title'] = df['title'].str.strip().str.title()
     df['company'] = df['company'].str.strip()
-    print("Transformation completed.")
+    
+    spam_words = [
+        'drive', 'driver', 'lyft', 'warehouse', 'delivery', 'assistant manager',
+        'veterinarian', 'starbucks', 'journalist', 'agency producer', 
+        'administrative assistant', 'patient care', 'equipment operator'
+    ]
+    df = df[~df['title'].str.lower().str.contains('|'.join(spam_words), na=False)]
+    
+    print(f"Transformation completed. {len(df)} jobs kept after filtering.")
     return df
 
 def load_data(df):
