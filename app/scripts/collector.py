@@ -8,7 +8,7 @@ def extract_data():
     print("Starting mass data extraction via The Muse API...")
     raw_jobs = []
     
-    for page in range(1, 25):
+    for page in range(1, 100):
         print(f"Downloading page {page}...")
         url = f"https://www.themuse.com/api/public/jobs?category=Software%20Engineering&page={page}"
         response = requests.get(url)
@@ -38,29 +38,19 @@ def extract_data():
     return df
 
 def transform_data(df):
-    print("Starting data transformation and feature engineering...")
+    print("Starting data transformation with strict whitelist filter...")
     df['salary'] = pd.to_numeric(df['salary'], errors='coerce').fillna(0.0)
     df['title'] = df['title'].str.strip().str.title()
     df['company'] = df['company'].str.strip()
     
-    spam_words = [
-        'drive', 'driver', 'lyft', 'warehouse', 'delivery', 'assistant manager',
-        'veterinarian', 'starbucks', 'journalist', 'agency producer', 
-        'administrative assistant', 'patient care', 'equipment operator'
+    valid_words = [
+        'software', 'developer', 'backend', 'frontend', 'fullstack', 
+        'data', 'machine learning', 'cyber', 'security', 'devops', 
+        'cloud', 'network', 'qa', 'system', 'artificial intelligence',
+        'ios', 'android', 'mobile'
     ]
-    df = df[~df['title'].str.lower().str.contains('|'.join(spam_words), na=False)]
-
-    def extract_tech(title):
-        title_lower = str(title).lower()
-        if 'python' in title_lower: return 'Python'
-        elif 'javascript' in title_lower or 'frontend' in title_lower: return 'JavaScript'
-        elif 'java' in title_lower: return 'Java'
-        elif 'react' in title_lower: return 'React'
-        elif 'data' in title_lower or 'machine learning' in title_lower: return 'Data/ML'
-        elif 'node' in title_lower: return 'Node.js'
-        else: return 'Not Specified'  
-        
-    df['technology'] = df['title'].apply(extract_tech)
+    
+    df = df[df['title'].str.lower().str.contains('|'.join(valid_words), na=False)]
     
     print(f"Transformation completed. {len(df)} jobs kept after filtering.")
     return df
@@ -74,7 +64,7 @@ def load_data(df):
                 title=row['title'],
                 company=row['company'],
                 location=row['location'],
-                technology=row['technology'],
+                technology="Python",
                 salary_min=float(row['salary']),
                 salary_max=0.0,
                 posted_at=datetime.now()
