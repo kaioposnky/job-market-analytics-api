@@ -6,14 +6,11 @@ class Job(Base):
     __tablename__ = "jobs"
 
     id = Column(Integer, primary_key=True, index=True)
-    
-    title = Column(String, nullable=False)
-    company = Column(String, nullable=False)
+    title = Column(String, nullable=False, index=True)
+    company = Column(String, nullable=False, index=True)
     location = Column(String)
-    description = Column(String)
     technology = Column(String, index=True)
-    
+    seniority = Column(String) 
     salary_min = Column(Float, nullable=True)
     salary_max = Column(Float, nullable=True)
-    
     posted_at = Column(DateTime, default=datetime.utcnow)

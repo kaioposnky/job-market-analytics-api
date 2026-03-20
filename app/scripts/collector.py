@@ -42,7 +42,7 @@ def extract_data():
     return df
 
 def transform_data(df):
-    print("Starting data transformation with strict whitelist filter and technology extraction...")
+    print("Starting data transformation: whitelist, technology, and seniority extraction...")
     df['salary'] = pd.to_numeric(df['salary'], errors='coerce').fillna(0.0)
     df['title'] = df['title'].str.strip().str.title()
     df['company'] = df['company'].str.strip()
@@ -65,7 +65,6 @@ def transform_data(df):
     def extract_tech(row):
         text_to_search = str(row['title']).lower() + " " + str(row['clean_desc'])
         techs = []
-        
         if 'python' in text_to_search: techs.append('Python')
         if 'java ' in text_to_search or 'spring' in text_to_search: techs.append('Java')
         if 'javascript' in text_to_search or 'react' in text_to_search: techs.append('JavaScript/React')
@@ -81,6 +80,20 @@ def transform_data(df):
         return ", ".join(techs) if techs else 'Not Specified'
         
     df['technology'] = df.apply(extract_tech, axis=1)
+
+    def extract_seniority(title):
+        t = str(title).lower()
+        words = t.split()
+        if any(word in t for word in ['senior', 'sr', 'sr.', 'principal', 'lead', 'staff', 'manager']) or 'iii' in words:
+            return 'Senior / Lead'
+        elif any(word in t for word in ['junior', 'jr', 'jr.', 'entry', 'intern', 'internship']) or 'i' in words:
+            return 'Junior / Entry'
+        elif 'mid' in t or 'ii' in words:
+            return 'Mid-Level'
+        else:
+            return 'Not Specified'
+
+    df['seniority'] = df['title'].apply(extract_seniority)
     
     print(f"Transformation completed. {len(df)} jobs kept after filtering.")
     return df
@@ -95,6 +108,7 @@ def load_data(df):
                 company=row['company'],
                 location=row['location'],
                 technology=row['technology'],
+                seniority=row['seniority'],  
                 salary_min=float(row['salary']),
                 salary_max=0.0,
                 posted_at=datetime.now()
