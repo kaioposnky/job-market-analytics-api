@@ -100,11 +100,11 @@ def transform_data(df: pd.DataFrame) -> pd.DataFrame:
     def clean_title(title):
         t = title.split('(')[0].strip()
         
-        t_normalized = t.replace(' - ', ',').replace('-', ',')
+        t_normalized = t.replace(' - ', ',').replace(' / ', ',')
         
         if ',' in t_normalized:
             parts = [p.strip() for p in t_normalized.split(',')]
-            if len(parts[0]) <= 8 and len(parts) > 1:
+            if len(parts[0]) <= 12 and len(parts) > 1:
                 t = parts[1]
             else:
                 t = parts[0]
