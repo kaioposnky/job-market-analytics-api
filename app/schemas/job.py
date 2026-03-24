@@ -7,11 +7,11 @@ class JobBase(BaseModel):
     company: str = Field(..., min_length=2)
     location: str
     technology: str
+    seniority: Optional[str] = None
     salary: Optional[float] = Field(None, ge=0)
 
 class JobCreate(JobBase):
-    description: str
-    source: str
+    pass
 
 class JobResponse(JobBase):
     id: int

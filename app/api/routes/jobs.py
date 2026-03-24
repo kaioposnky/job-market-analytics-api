@@ -10,20 +10,20 @@ router = APIRouter()
 
 @router.get("/jobs", response_model=List[JobResponse])
 def read_jobs(db: Session = Depends(get_db)):
-
+    
     jobs = db.query(Job).all()
     return jobs
 
 @router.post("/jobs", response_model=JobResponse)
 def create_job(job: JobCreate, db: Session = Depends(get_db)):
-
+    
     new_job = Job(
         title=job.title,
         company=job.company,
         location=job.location,
         technology=job.technology,
-        salary=job.salary,
-        description=job.description
+        seniority=job.seniority,
+        salary=job.salary
     )
     
     db.add(new_job)
