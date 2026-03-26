@@ -9,7 +9,7 @@ def extract_data() -> pd.DataFrame:
     print("Starting mass data extraction via The Muse API...")
     raw_jobs = []
     
-    for page in range(1, 15):
+    for page in range(1, 100):
         print(f"Downloading page {page}...")
         url = f"https://www.themuse.com/api/public/jobs?category=Software%20Engineering&page={page}"
         response = requests.get(url)
