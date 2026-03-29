@@ -41,6 +41,8 @@ app = FastAPI(
     }
 )
 
+print("\nAPI in on! Access: http://localhost:8000\n", flush=True)
+
 @app.get("/", include_in_schema=False)
 def docs_redirect():
     return RedirectResponse(url="/docs")
