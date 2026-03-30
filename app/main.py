@@ -21,9 +21,9 @@ tags_metadata = [
 ]
 
 description = """
-An analytical API designed to extract, clean, and provide insights on the Tech Job Market. 🚀
+An analytical API designed to extract, clean, and provide insights on the Tech Job Market.
 
-### 📊 Core Features
+### Core Features
 * **Job Explorer:** Filter opportunities by technology, seniority, location, and company.
 * **Market Intelligence:** Access aggregated metrics on remote work trends, top technologies, and hiring companies.
 
@@ -37,11 +37,11 @@ app = FastAPI(
     openapi_tags=tags_metadata,
     contact={
         "name": "GitHub Repository",
-        "url": "https://github.com/abreu-joao/job-market-api",
+        "url": "https://github.com/abreu-joao/job-market-analytics-api",
     }
 )
 
-print("\nAPI is on! Access: http://localhost:8000\n", flush=True)
+print("\nAPI is ON! Access: http://localhost:8000\n", flush=True)
 
 @app.get("/", include_in_schema=False)
 def docs_redirect():
